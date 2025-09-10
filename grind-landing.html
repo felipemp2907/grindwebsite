@@ -1,0 +1,927 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Grind — Set targets. Prove progress. Achieve goals.</title>
+  <meta name="description" content="Set targets. Prove progress. Achieve goals.">
+
+  <!-- OpenGraph / Twitter -->
+  <meta property="og:title" content="Grind — Set targets. Prove progress. Achieve goals.">
+  <meta property="og:description" content="Set targets. Prove progress. Achieve goals.">
+  <meta property="og:image" content="/public/logo-target.png">
+  <meta property="og:url" content="/">
+  <meta property="og:type" content="website">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Grind — Set targets. Prove progress. Achieve goals.">
+  <meta name="twitter:description" content="Set targets. Prove progress. Achieve goals.">
+  <meta name="twitter:image" content="/public/logo-target.png">
+
+  <!-- Icons / Manifest -->
+  <link rel="icon" href="/public/favicon.ico" />
+  <link rel="apple-touch-icon" href="/public/icon-192.png" />
+  <link rel="manifest" href="/manifest.json" />
+
+  <!-- Fonts & CSS framework -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            bg: '#0B0B0C', surface: '#111114', hair: '#232329', text: '#FFFFFF', muted: '#A0A0AA',
+            today: '#8B8BFF', streak: '#FFC736', proof: '#8B5CF6', deadlines: '#E26262'
+          },
+          fontFamily: {
+            sans: ['Inter','sans-serif'],
+            mono: ['ui-monospace','SFMono-Regular','Menlo','Monaco','Consolas','Liberation Mono','Courier New','monospace']
+          },
+          borderRadius: { card: '16px' }
+        }
+      }
+    }
+  </script>
+  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet" />
+
+  <style>
+    :root { --bg:#0B0B0C; --surface:#111114; --hair:#232329; --text:#FFFFFF; --muted:#A0A0AA; --today:#8B8BFF; --streak:#FFC736; --proof:#8B5CF6; --deadlines:#E26262; }
+    body{ background-color:var(--bg); color:var(--text); font-family:'Inter',sans-serif; }
+    .card{ background-color:var(--surface); border:1px solid var(--hair); border-radius:16px; box-shadow:inset 0 1px 1px rgba(255,255,255,.05); }
+    .btn-primary{ background:linear-gradient(90deg,#8B5CF6, #7C3AED); border-radius:9999px; padding:12px 24px; font-weight:600; transition:all .2s; }
+    .btn-primary:hover{ background:linear-gradient(90deg,#7C3AED,#6D28D9); transform:translateY(-2px); box-shadow:0 4px 12px rgba(139,92,246,.3); }
+    .btn-ghost{ border:1px solid var(--hair); border-radius:9999px; padding:12px 24px; font-weight:600; transition:all .2s; }
+    .btn-ghost:hover{ background-color:rgba(255,255,255,.05); }
+    .feature-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:24px; }
+    #features .card{ transition:transform .3s, box-shadow .3s; }
+    #features .card:hover{ transform:translateY(-4px); box-shadow:0 8px 25px rgba(0,0,0,.15); }
+    @media (prefers-reduced-motion: reduce){ #features .card{ transition:none } .btn-primary:hover,.btn-ghost:hover{ transform:none } }
+    .concentric-rings{ background-image:radial-gradient(circle at 50% 50%, rgba(255,255,255,.05) 0%, transparent 60%); background-repeat:no-repeat; background-position:center; background-size:100% 100%; }
+    .proof-card{ transform:translateY(20px); opacity:0; transition:all .3s; }
+    .proof-card.active{ transform:translateY(0); opacity:1; }
+    .flame-icon{ filter:drop-shadow(0 0 8px rgba(255,199,54,.5)); }
+
+    /* Minimal Goal Demo tokens */
+    .gd-entity{ background-color:rgba(138,108,255,.1); color:#8A6CFF; padding:2px 8px; border-radius:12px; font-size:.75rem; font-weight:500; }
+    .gd-entities{ opacity:0; transform:translateY(5px); transition:opacity .18s, transform .18s; }
+    .gd-entities.visible{ opacity:1; transform:translateY(0) }
+    .gd-task-item{ background:#0F1012; border:1px solid #2D2E33; border-radius:12px; padding:8px 12px; display:flex; align-items:center; justify-content:space-between; opacity:0; transform:translateY(5px); }
+    .gd-task-item.visible{ opacity:1; transform:translateY(0); transition:opacity .18s, transform .18s }
+    .gd-task-check{ width:16px; height:16px; border:1.5px solid #2D2E33; border-radius:50%; margin-right:10px; position:relative; }
+    .gd-task-check.checked::after{ content:''; position:absolute; top:2px; left:2px; width:10px; height:10px; background:#3EE37A; border-radius:50% }
+    .gd-xp-pill{ background-color:rgba(62,227,122,.1); color:#3EE37A; padding:2px 6px; border-radius:8px; font-size:.7rem; font-weight:600; }
+    .gd-generate-btn{ opacity:0; transform:scale(.95); transition:all .2s }
+    .gd-generate-btn.visible{ opacity:1; transform:scale(1) }
+    .gd-shimmer-bar{ background-size:200% 100%; transition:opacity .3s }
+    .sr-only{ position:absolute!important; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0; }
+    
+    /* New Goal Demo Styles */
+    :root {
+      --bg-dark: #0B0C0F;
+      --card-bg: #0F1012;
+      --hairline: #2D2E33;
+      --text-primary: #FFFFFF;
+      --text-muted: #A0A0AA;
+      --accent-from: #8A6CFF;
+      --accent-to: #A88CFF;
+      --success-green: #3EE37A;
+      --loader-gradient: linear-gradient(90deg, #8A6CFF, #A88CFF, #8A6CFF);
+    }
+
+    .goal-demo {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .gd-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+      gap: 24px;
+    }
+
+    @media (max-width: 900px) {
+      .gd-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .gd-card {
+      background-color: var(--card-bg);
+      border: 1px solid var(--hairline);
+      border-radius: 18px;
+      padding: 24px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+    }
+
+    .gd-card h3 {
+      margin-top: 0;
+      font-size: 1.25rem;
+      font-weight: 600;
+    }
+
+    .gd-card p {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      margin-top: 0;
+    }
+
+    /* Left Card Styles */
+    .gd-fake-input {
+      background: #141518;
+      border: 1px solid #2D2E33;
+      border-radius: 12px;
+      padding: 16px;
+      min-height: 60px;
+      font-size: 1rem;
+      color: var(--text-primary);
+      margin-bottom: 16px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .gd-typed-text {
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .gd-entities {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 16px;
+      opacity: 0;
+      transform: translateY(5px);
+      transition: opacity 0.18s, transform 0.18s;
+    }
+
+    .gd-entities.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .gd-entity {
+      background-color: rgba(138, 108, 255, 0.15);
+      color: #A88CFF;
+      padding: 4px 10px;
+      border-radius: 16px;
+      font-size: 0.8rem;
+      font-weight: 500;
+    }
+
+    .gd-generate-chip {
+      display: inline-block;
+      background: linear-gradient(90deg, var(--accent-from), var(--accent-to));
+      color: white;
+      padding: 6px 14px;
+      border-radius: 999px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin-top: 8px;
+      opacity: 0;
+      transform: scale(0.95);
+      transition: all 0.2s ease;
+      cursor: pointer;
+    }
+
+    .gd-generate-chip.visible {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    .gd-thinking {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 16px;
+      background: rgba(20, 21, 24, 0.8);
+      border-radius: 12px;
+      margin-top: 16px;
+      opacity: 0;
+      transform: translateY(10px);
+      transition: opacity 0.3s, transform 0.3s;
+    }
+
+    .gd-thinking.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .gd-loader-bar {
+      flex: 1;
+      height: 6px;
+      background: #1a1b1e;
+      border-radius: 3px;
+      overflow: hidden;
+    }
+
+    .gd-loader-fill {
+      height: 100%;
+      background: var(--loader-gradient);
+      background-size: 200% 100%;
+      border-radius: 3px;
+      animation: loading 1.5s linear infinite;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .gd-loader-fill {
+        animation: none;
+        background-size: 100% 100%;
+      }
+    }
+
+    @keyframes loading {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+
+    /* Right Card Styles */
+    .gd-plan-section {
+      margin-top: 16px;
+    }
+
+    .gd-task-list {
+      margin-bottom: 20px;
+    }
+
+    .gd-task-list h4 {
+      margin-top: 0;
+      margin-bottom: 12px;
+      font-size: 1rem;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .gd-task-list h4::before {
+      content: "";
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background-color: var(--streak); /* Yellow for Streak Tasks */
+    }
+
+    .gd-task-list:nth-child(2) h4::before {
+      background-color: var(--proof); /* Purple for Today Tasks */
+    }
+
+    .gd-task-item {
+      background: #141518;
+      border: 1px solid #2D2E33;
+      border-radius: 12px;
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+      opacity: 0;
+      transform: translateY(10px);
+      transition: opacity 0.2s, transform 0.2s;
+    }
+
+    .gd-task-item.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .gd-xp-pill {
+      background-color: rgba(62, 227, 122, 0.15);
+      color: var(--success-green);
+      padding: 3px 8px;
+      border-radius: 8px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+
+    .gd-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 20px;
+      padding-top: 16px;
+      border-top: 1px solid var(--hairline);
+    }
+
+    .gd-days-left {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+    }
+
+    .gd-progress-container {
+      flex: 1;
+      margin: 0 16px;
+    }
+
+    .gd-progress-bar {
+      height: 6px;
+      background: #1a1b1e;
+      border-radius: 3px;
+      overflow: hidden;
+    }
+
+    .gd-progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent-from), var(--accent-to));
+      border-radius: 3px;
+      width: 0%;
+      transition: width 0.5s ease;
+    }
+
+    .gd-progress-text {
+      text-align: right;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-top: 6px;
+    }
+
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+    
+    /* Increased height for the ultimate goals section */
+    #ultimate-goals-section {
+      min-height: 900px; /* Increased by 80% from original 500px */
+    }
+    
+    /* Today Tasks Section Styles */
+    .today-icon {
+      filter: drop-shadow(0 0 8px rgba(139, 139, 255, 0.5));
+    }
+    
+    /* Expanded Hero Section */
+    #top {
+      padding-top: 8rem;
+      padding-bottom: 8rem;
+    }
+    
+    @media (min-width: 768px) {
+      #top {
+        padding-top: 12rem;
+        padding-bottom: 12rem;
+      }
+    }
+  </style>
+</head>
+<body class="min-h-screen bg-bg text-text">
+  <!-- Navigation -->
+  <nav class="fixed top-0 left-0 right-0 z-50 bg-black py-4">
+    <div class="container mx-auto px-6 flex items-center justify-between">
+      <a href="#top" class="flex items-center scroll-smooth">
+        <img src="https://huggingface.co/spaces/maxnova/grindtest/resolve/main/images/imagem_2025-09-05_010431599.png" alt="Grind target logo" class="h-16 w-16" />
+        <span class="font-bold text-2xl ml-2">Grind</span>
+      </a>
+      <div class="hidden md:flex items-center space-x-6 -ml-2">
+        <a href="#features" class="text-white hover:text-muted transition-colors scroll-smooth">Features</a>
+        <a href="#how" class="text-white hover:text-muted transition-colors scroll-smooth">How it works</a>
+        <a href="#faq" class="text-white hover:text-muted transition-colors scroll-smooth">FAQ</a>
+        <a href="https://www.instagram.com/grind.app" target="_blank" rel="noopener noreferrer" class="text-white hover:text-muted transition-colors">Instagram</a>
+        <a href="#waitlist" class="btn-primary">Join waitlist</a>
+      </div>
+      <button class="md:hidden text-white"><i data-feather="menu"></i></button>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <section id="top" class="relative overflow-hidden">
+    <div class="concentric-rings absolute inset-0 opacity-10"></div>
+    <div class="container mx-auto px-6 relative z-10">
+      <div class="max-w-4xl mx-auto text-center">
+        <h1 class="text-5xl md:text-6xl font-bold mb-6 leading-tight" data-aos="fade-up" data-aos-delay="100">The only app that makes you <span class="bg-gradient-to-r from-today to-proof bg-clip-text text-transparent">lock in.</span></h1>
+        <p class="text-xl text-muted mb-8" data-aos="fade-up" data-aos-delay="200">Set targets. Prove progress. Achieve goals.</p>
+        <div class="flex flex-col sm:flex-row gap-4 justify-center" data-aos="fade-up" data-aos-delay="400">
+          <a href="#waitlist" class="btn-primary scroll-smooth">Get early access</a>
+          <a href="#how" class="btn-ghost scroll-smooth">See how it works</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Ultimate Goals (live-region only, demo JS will short-circuit if markup is missing) -->
+  <section id="ultimate-goals-section" class="py-20 bg-surface">
+    <div class="container mx-auto px-6">
+      <h2 class="text-3xl md:text-4xl font-bold text-center mb-12" data-aos="fade-up">Set your <span class="bg-gradient-to-r from-today to-proof bg-clip-text text-transparent">Ultimate Goals</span>, AI will do the rest.</h2>
+      
+      <!-- New Goal Demo Animation -->
+      <section class="goal-demo">
+        <div class="gd-grid">
+          <!-- Left Card -->
+          <div class="gd-card gd-left">
+            <div class="gd-fake-input">
+              <span class="gd-typed-text"></span>
+            </div>
+            <div class="gd-entities"></div>
+            <div class="gd-generate-chip">Generate Plan</div>
+            <div class="gd-thinking">
+              <span>Hustle is thinking...</span>
+              <div class="gd-loader-bar">
+                <div class="gd-loader-fill"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right Card -->
+          <div class="gd-card gd-right">
+            <div class="gd-plan-section">
+              <div class="gd-task-list">
+                <h4>Streak Tasks (<span class="gd-streak-count">0</span>)</h4>
+                <div class="gd-streak-list"></div>
+              </div>
+              <div class="gd-task-list">
+                <h4>Today Tasks (<span class="gd-today-count">0</span>)</h4>
+                <div class="gd-today-list"></div>
+              </div>
+              <div class="gd-footer">
+                <div class="gd-days-left">Loading...</div>
+                <div class="gd-progress-container">
+                  <div class="gd-progress-bar">
+                    <div class="gd-progress-fill"></div>
+                  </div>
+                  <div class="gd-progress-text">0% complete</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div id="gd-announce" class="sr-only" aria-live="polite" aria-atomic="true"></div>
+      </section>
+    </div>
+  </section>
+
+  <!-- Features -->
+  <section id="features" class="py-20">
+    <div class="container mx-auto px-6">
+      <h2 class="text-3xl md:text-4xl font-bold text-center mb-12" data-aos="fade-up">Features</h2>
+      <div class="feature-grid">
+        <div class="card p-6" data-aos="fade-up"><div class="h-12 w-12 rounded-full bg-today/20 flex items-center justify-center mb-4"><i data-feather="target" class="text-today"></i></div><h3 class="text-xl font-semibold mb-2">Set Your Ultimate Goal</h3><p class="text-muted">Describe the goal. AI builds the plan.</p></div>
+        <div class="card p-6" data-aos="fade-up" data-aos-delay="100"><div class="h-12 w-12 rounded-full bg-today/20 flex items-center justify-center mb-4"><i data-feather="check-circle" class="text-today"></i></div><h3 class="text-xl font-semibold mb-2">Today Tasks</h3><p class="text-muted">Daily actions tailored to your progress.</p></div>
+        <div class="card p-6" data-aos="fade-up" data-aos-delay="200"><div class="h-12 w-12 rounded-full bg-streak/20 flex items-center justify-center mb-4"><i data-feather="trending-up" class="text-streak"></i></div><h3 class="text-xl font-semibold mb-2">Streak Tasks</h3><p class="text-muted">Consistency engine. Show up daily.</p></div>
+        <div class="card p-6" data-aos="fade-up" data-aos-delay="300"><div class="h-12 w-12 rounded-full bg-proof/20 flex items-center justify-center mb-4"><i data-feather="camera" class="text-proof"></i></div><h3 class="text-xl font-semibold mb-2">Validate with Proof</h3><p class="text-muted">Snap proof. Earn XP. Keep the streak.</p></div>
+        <div class="card p-6" data-aos="fade-up" data-aos-delay="400"><div class="h-12 w-12 rounded-full bg-muted/20 flex items-center justify-center mb-4"><i data-feather="book" class="text-muted"></i></div><h3 class="text-xl font-semibold mb-2">Journal</h3><p class="text-muted">Document your journey. Everything saved.</p></div>
+        <div class="card p-6" data-aos="fade-up" data-aos-delay="500"><div class="h-12 w-12 rounded-full bg-deadlines/20 flex items-center justify-center mb-4"><i data-feather="calendar" class="text-deadlines"></i></div><h3 class="text-xl font-semibold mb-2">Calendar & Deadlines</h3><p class="text-muted">Milestones and countdowns keep you honest.</p></div>
+        <div class="card p-6" data-aos="fade-up" data-aos-delay="600"><div class="h-12 w-12 rounded-full bg-today/20 flex items-center justify-center mb-4"><i data-feather="message-circle" class="text-today"></i></div><h3 class="text-xl font-semibold mb-2">Hustle AI Coach</h3><p class="text-muted">Chat with your AI coach to plan, adjust, and automate your next moves.</p></div>
+        <div class="card p-6" data-aos="fade-up" data-aos-delay="700"><div class="h-12 w-12 rounded-full bg-streak/20 flex items-center justify-center mb-4"><i data-feather="clock" class="text-streak"></i></div><h3 class="text-xl font-semibold mb-2">Goal Countdown</h3><p class="text-muted">Visualize your progress with dynamic countdowns to your ultimate goals.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- How it works -->
+  <section id="how" class="py-20">
+    <div class="container mx-auto px-6">
+      <h2 class="text-3xl md:text-4xl font-bold text-center mb-16" data-aos="fade-up">How It Works</h2>
+      <div class="grid md:grid-cols-3 gap-12 max-w-5xl mx-auto">
+        <div class="text-center" data-aos="fade-up"><div class="h-16 w-16 rounded-full bg-today/20 flex items-center justify-center mx-auto mb-6"><span class="text-2xl font-bold text-today">1</span></div><h3 class="text-xl font-semibold mb-4">Set your Ultimate Goal.</h3><p class="text-muted">Describe the outcome; pick a deadline.</p></div>
+        <div class="text-center" data-aos="fade-up" data-aos-delay="100"><div class="h-16 w-16 rounded-full bg-today/20 flex items-center justify-center mx-auto mb-6"><span class="text-2xl font-bold text-today">2</span></div><h3 class="text-xl font-semibold mb-4">Let Hustle plan.</h3><p class="text-muted">We split habits (streak) and work (today), then schedule every day to your deadline.</p></div>
+        <div class="text-center" data-aos="fade-up" data-aos-delay="200"><div class="h-16 w-16 rounded-full bg-today/20 flex items-center justify-center mx-auto mb-6"><span class="text-2xl font-bold text-today">3</span></div><h3 class="text-xl font-semibold mb-4">Execute, prove, level up.</h3><p class="text-muted">Capture proof → earn XP → keep momentum.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Streak Tasks band (kept minimal) -->
+  <section class="py-20 bg-streak/5">
+    <div class="container mx-auto px-6">
+      <div class="max-w-4xl mx-auto">
+        <h2 class="text-3xl md:text-4xl font-bold text-center mb-6" data-aos="fade-up">Streak Tasks</h2>
+        <p class="text-xl text-muted text-center mb-12" data-aos="fade-up" data-aos-delay="100">Let AI generate repeating tasks tracked daily to build consistency.</p>
+        <div class="card p-6" data-aos="fade-up" data-aos-delay="200">
+          <div class="flex items-center mb-6">
+            <div class="flame-icon h-8 w-8 bg-streak/20 rounded-full flex items-center justify-center mr-4"><i data-feather="flame" class="text-streak"></i></div>
+            <div class="flex-1"><h3 class="font-semibold">Daily Meditation</h3><p class="text-sm text-muted">Streak: <span class="font-mono text-text">14 days</span></p></div>
+          </div>
+          <div class="w-full bg-hair rounded-full h-2 mb-4"><div class="bg-streak h-2 rounded-full" style="width:75%"></div></div>
+          <div class="flex justify-between text-sm text-muted"><span>Today</span><span>75% complete</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Today Tasks band -->
+  <section class="py-20 bg-proof/10">
+    <div class="container mx-auto px-6">
+      <div class="max-w-4xl mx-auto">
+        <h2 class="text-3xl md:text-4xl font-bold text-center mb-6" data-aos="fade-up">Today Tasks</h2>
+        <p class="text-xl text-muted text-center mb-12" data-aos="fade-up" data-aos-delay="100">Let AI generate daily goal-based actions tailored to your current progress.</p>
+        <div class="card p-6" data-aos="fade-up" data-aos-delay="200">
+          <div class="flex items-center mb-6">
+            <div class="today-icon h-8 w-8 bg-today/20 rounded-full flex items-center justify-center mr-4"><i data-feather="target" class="text-today"></i></div>
+            <div class="flex-1"><h3 class="font-semibold">Leg Day Workout</h3><p class="text-sm text-muted">Priority: <span class="font-mono text-text">High</span></p></div>
+          </div>
+          <div class="w-full bg-hair rounded-full h-2 mb-4"><div class="bg-today h-2 rounded-full" style="width:45%"></div></div>
+          <div class="flex justify-between text-sm text-muted"><span>Today</span><span>45% complete</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Validate with Proof (kept minimal) -->
+  <section class="py-20 bg-black">
+    <div class="container mx-auto px-6">
+      <div class="max-w-4xl mx-auto">
+        <h2 class="text-3xl md:text-4xl font-bold text-center mb-6 text-[#e8f5e8]" data-aos="fade-up">Validate Your Task</h2>
+        <p class="text-xl text-center mb-12 text-[#e8f5e8]" data-aos="fade-up" data-aos-delay="100">Prove that you put in the work.</p>
+        <div class="grid md:grid-cols-2 gap-8 items-center" data-aos="fade-up" data-aos-delay="200">
+          <div class="relative">
+            <img src="https://huggingface.co/spaces/maxnova/grindtest/resolve/main/images/imagem_2025-09-05_041109505.png" width="400" height="400" alt="Task proof example" class="rounded-2xl" />
+            <div class="proof-card absolute -bottom-4 -right-4 bg-green-600 text-white p-4 rounded-2xl shadow-lg">
+              <div class="flex items-center"><i data-feather="check-circle" class="mr-2"></i><span class="font-semibold">Excellent Proof</span></div>
+              <p class="text-sm opacity-90">+25 <span class="font-mono">XP</span></p>
+            </div>
+          </div>
+          <div>
+            <div class="card p-6 mb-6"><h3 class="font-semibold mb-2">AI Analysis</h3><p class="text-muted text-sm">Our AI verifies your proof and awards XP based on quality and completeness.</p></div>
+            <div class="flex items-center text-white"><i data-feather="zap" class="mr-2 text-white"></i><span>Earn <span class="font-mono">XP</span> to level up and maintain streaks</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Journal band (short) -->
+  <section class="py-20 bg-black">
+    <div class="container mx-auto px-6">
+      <div class="max-w-4xl mx-auto">
+        <h2 class="text-3xl md:text-4xl font-bold text-center mb-6" data-aos="fade-up">Document <span class="bg-gradient-to-r from-today to-proof bg-clip-text text-transparent">Your Journey</span></h2>
+        <p class="text-xl text-muted text-center mb-12" data-aos="fade-up" data-aos-delay="100">Your task proofs will be saved in your <span class="font-semibold text-text">Journal</span>.</p>
+        <div class="relative flex justify-center" data-aos="fade-up" data-aos-delay="200">
+          <img src="https://huggingface.co/spaces/maxnova/girndapp/resolve/main/images/imagem_2025-09-07_231928231.png" width="240" height="240" alt="Journal example" class="rounded-2xl" />
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Hustle AI Coach Demo (trimmed CSS, fixed matchMedia) -->
+  <section class="py-20 bg-surface">
+    <div class="container mx-auto px-6">
+      <div class="max-w-4xl mx-auto">
+        <h2 class="text-3xl md:text-4xl font-bold text-center mb-6" data-aos="fade-up">Chat with <span class="bg-gradient-to-r from-today to-proof bg-clip-text text-transparent">Hustle</span> — Your <span class="bg-gradient-to-r from-today to-proof bg-clip-text text-transparent">AI</span> Coach</h2>
+        <p class="text-xl text-muted text-center mb-12" data-aos="fade-up" data-aos-delay="100">Ask. Plan. Adjust. Automate the next move.</p>
+        <section id="chat-with-hustle" aria-label="Chat with Hustle — demo" class="mt-12">
+          <div class="chat-shell"><ul class="log" role="log" aria-live="polite"></ul></div>
+        </section>
+        <style>
+          #chat-with-hustle{ min-height:280px; max-width:640px; margin:0 auto; position:relative }
+          #chat-with-hustle .log{ display:grid; grid-auto-rows:min-content; gap:14px; padding:0; margin:0; list-style:none }
+          #chat-with-hustle .message{ max-width:85%; padding:12px 16px; border-radius:16px; box-shadow:0 6px 28px rgba(0,0,0,.35); opacity:0; transform:translateY(20px); transition:opacity .3s, transform .3s }
+          #chat-with-hustle .message.visible{ opacity:1; transform:translateY(0) }
+          #chat-with-hustle .user-message{ background:#fff; color:#0b0c0f; justify-self:start }
+          #chat-with-hustle .ai-message{ background:#121418; color:#f4f6f8; justify-self:end }
+          #chat-with-hustle .task-card{ background:#16a34a; color:#fff; border-radius:12px; padding:12px; margin-top:8px; box-shadow:0 0 0 1px #22c55e inset }
+          #chat-with-hustle .task-header{ display:flex; align-items:center; margin-bottom:6px }
+          #chat-with-hustle .task-chip{ background:rgba(255,255,255,.2); padding:4px 8px; border-radius:999px; font-size:12px; font-weight:600 }
+          #chat-with-hustle .task-check{ margin-left:auto; font-weight:800 }
+          #chat-with-hustle .task-title{ font-weight:700; margin-bottom:4px }
+          #chat-with-hustle .task-meta{ font-size:13px; opacity:.9 }
+          #chat-with-hustle .typing-container{ position:relative }
+          #chat-with-hustle .typed-text{ white-space:pre-wrap; word-break:break-word }
+          #chat-with-hustle .caret{ position:absolute; width:8px; height:1.2em; background:#0b0c0f; animation: blink 1s steps(1) infinite }
+          @keyframes blink{ 50% { opacity:0 } }
+          @media (prefers-reduced-motion: reduce){ #chat-with-hustle .message, #chat-with-hustle .caret{ transition:none; animation:none } }
+        </style>
+        <script>
+          (function(){
+            const SCENARIOS=[
+              {user:"Schedule a workout with Michael for tomorrow at 7 p.m.",task:"Workout with Michael",date:"Tomorrow",time:"19:00"},
+              {user:"Plan a 1-hour study session today at 4 p.m.",task:"Study Session",date:"Today",time:"16:00"},
+              {user:"Block 30 minutes to review Spanish vocab at 8 p.m.",task:"Spanish Vocab Review",date:"Today",time:"20:00"}
+            ];
+            const chatLog=document.querySelector('#chat-with-hustle .log');
+            const reduceMotion=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+            let current=0, busy=false;
+            function userMsg(text){const li=document.createElement('li');li.className='message user-message';const c=document.createElement('div');c.className='typing-container';const t=document.createElement('span');t.className='typed-text';const caret=document.createElement('span');caret.className='caret';caret.setAttribute('aria-hidden','true');c.append(t, caret);li.appendChild(c);return {li,t,caret};}
+            function aiMsg(task,date,time){const li=document.createElement('li');li.className='message ai-message';const text=document.createElement('div');text.textContent="Got it — I've scheduled this and added it to Today Tasks.";const card=document.createElement('div');card.className='task-card';const header=document.createElement('div');header.className='task-header';const chip=document.createElement('span');chip.className='task-chip';chip.textContent='Task Created';const check=document.createElement('span');check.className='task-check';check.textContent='✓';header.append(chip,check);const title=document.createElement('div');title.className='task-title';title.textContent=`Task: ${task}`;const meta=document.createElement('div');meta.className='task-meta';meta.textContent=`Date: ${date} — Time: ${time}`;card.append(header,title,meta);li.append(text,card);return li;}
+            function positionCaret(typed,caret){const r=document.createRange();r.selectNodeContents(typed);r.setStart(typed.lastChild||typed, typed.textContent.length);r.setEnd(typed.lastChild||typed, typed.textContent.length);const rect=r.getBoundingClientRect(), base=typed.getBoundingClientRect();caret.style.left=`${rect.right-base.left+2}px`;caret.style.top=`${rect.top-base.top}px`;}
+            async function type(typed,caret,text){if(reduceMotion){typed.textContent=text;return;}for(let i=0;i<text.length;i++){typed.textContent+=text[i];positionCaret(typed,caret);await new Promise(r=>setTimeout(r,20+Math.random()*12));}}
+            async function cycle(){ if(busy) return; busy=true; chatLog.innerHTML=''; const s=SCENARIOS[current]; const {li, t, caret}=userMsg(s.user); chatLog.appendChild(li); await type(t, caret, s.user); caret.remove(); li.classList.add('visible'); await new Promise(r=>setTimeout(r, reduceMotion? 800: 700)); const ai=aiMsg(s.task,s.date,s.time); chatLog.appendChild(ai); setTimeout(()=>ai.classList.add('visible'),10); await new Promise(r=>setTimeout(r, reduceMotion? 2000: 2600)); li.classList.remove('visible'); ai.classList.remove('visible'); await new Promise(r=>setTimeout(r, reduceMotion? 700: 600)); current=(current+1)%SCENARIOS.length; busy=false; cycle(); }
+            document.addEventListener('visibilitychange',()=>{ if(!document.hidden && !busy) cycle(); });
+            cycle();
+          })();
+        </script>
+      </div>
+    </div>
+  </section>
+
+  <!-- Closer -->
+  <section class="py-20 bg-bg">
+    <div class="container mx-auto px-6 text-center">
+      <p class="text-4xl md:text-5xl font-bold mb-12" data-aos="fade-up">Set targets. Prove progress. Achieve goals.</p>
+      <img src="https://huggingface.co/spaces/maxnova/grindtest/resolve/main/images/imagem_2025-09-05_013252121.png" alt="Grind target logo" width="200" height="200" class="mx-auto opacity-80" data-aos="fade-up" data-aos-delay="100" />
+    </div>
+  </section>
+
+  <!-- Waitlist -->
+  <section id="waitlist" class="py-20 bg-bg">
+    <div class="container mx-auto px-6">
+      <div class="max-w-2xl mx-auto text-center">
+        <h2 class="text-3xl md:text-4xl font-bold mb-6" data-aos="fade-up">Be first to try Grind</h2>
+        <p class="text-xl text-muted mb-10" data-aos="fade-up" data-aos-delay="100">We'll invite the waitlist in waves and prioritize strong use cases.</p>
+        <form class="space-y-4 text-left" data-aos="fade-up" data-aos-delay="200" id="waitlist-form">
+          <input type="email" required placeholder="Your email address" class="w-full px-4 py-3 bg-surface border border-hair rounded-card focus:outline-none focus:ring-2 focus:ring-today" />
+          <input type="text" name="company" class="hidden" aria-hidden="true" tabindex="-1" autocomplete="off" />
+          <button type="submit" class="btn-primary w-full">Join waitlist</button>
+        </form>
+        <div id="form-success" class="hidden mt-6 p-4 bg-proof/10 border border-proof/20 rounded-card" data-aos="fade"><div class="flex items-center"><i data-feather="check-circle" class="text-proof mr-2"></i><span>Thanks! We've added you to the waitlist.</span></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section id="faq" class="py-20">
+    <div class="container mx-auto px-6">
+      <h2 class="text-3xl md:text-4xl font-bold text-center mb-12" data-aos="fade-up">FAQ</h2>
+      <div class="max-w-3xl mx-auto space-y-6">
+        <div class="card p-6" data-aos="fade-up"><h3 class="text-lg font-semibold mb-2">Is this iOS or Android?</h3><p class="text-muted">We're launching on iOS first; Android follows.</p></div>
+        <div class="card p-6" data-aos="fade-up" data-aos-delay="100"><h3 class="text-lg font-semibold mb-2">How are "Streak" and "Today" tasks different?</h3><p class="text-muted">Streak tasks are daily habits (same every day). Today tasks vary and push the project forward.</p></div>
+        <div class="card p-6" data-aos="fade-up" data-aos-delay="200"><h3 class="text-lg font-semibold mb-2">What counts as proof?</h3><p class="text-muted">A photo, file, link, or note—anything verifiable. Proof earns XP and protects your streak.</p></div>
+        <div class="card p-6" data-aos="fade-up" data-aos-delay="300"><h3 class="text-lg font-semibold mb-2">When is launch?</h3><p class="text-muted">We're onboarding in waves. Join the waitlist to get early access.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="py-8 border-t border-hair">
+    <div class="container mx-auto px-6">
+      <div class="flex flex-col md:flex-row justify-between items-center">
+        <p class="text-muted">© <span id="current-year"></span> Grind by Sonho100Limites. All rights reserved.</p>
+        <div class="mt-4 md:mt-0">
+          <a href="https://www.instagram.com/grind.app" target="_blank" rel="noopener noreferrer" class="text-muted hover:text-white transition-colors flex items-center">
+            <i data-feather="instagram" class="mr-2"></i>
+            Follow us on Instagram
+          </a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="https://unpkg.com/feather-icons" defer></script>
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js" defer></script>
+  <script>
+    window.addEventListener('DOMContentLoaded',()=>{
+      if(window.AOS){ AOS.init({ duration:600, once:true, offset:100 }); }
+      if(window.feather){ feather.replace(); }
+      document.getElementById('current-year').textContent=new Date().getFullYear();
+      document.querySelectorAll('a.scroll-smooth').forEach(a=>a.addEventListener('click',e=>{ e.preventDefault(); const id=a.getAttribute('href'); const el=document.querySelector(id); if(el){ window.scrollTo({ top: el.offsetTop-80, behavior:'smooth' }); }}));
+      // Proof card pop
+      const pcs=document.querySelectorAll('.proof-card'); 
+      pcs.forEach((pc,idx)=>{ 
+        if(pc && !pc.closest('#journal-section')) {  // Only animate proof cards outside journal section
+          setTimeout(()=>pc.classList.add('active'),700+(idx*300)); 
+        } 
+      });
+      // Waitlist form
+      const form=document.getElementById('waitlist-form'); const ok=document.getElementById('form-success');
+      if(form){ form.addEventListener('submit',e=>{ e.preventDefault(); const email=form.querySelector('input[type="email"]'); const hp=form.querySelector('input[name="company"]'); if(hp && hp.value) return; if(email && email.validity.valid){ form.reset(); ok.classList.remove('hidden'); setTimeout(()=>ok.classList.add('hidden'),5000); }}); }
+
+      // Lightweight runtime tests (sanity checks)
+      console.assert(!document.querySelector('.gd-typed-text') || document.getElementById('gd-announce'), 'Expected #gd-announce when goal demo is present');
+      console.assert(typeof window.matchMedia==='function', 'matchMedia should exist');
+      console.assert(document.querySelector('#chat-with-hustle .log'), 'Chat log container should exist');
+    });
+  </script>
+
+  <!-- Goal Demo script (robust + short-circuits if markup is missing) -->
+  <script>
+    (function(){
+      const goals=[
+        { text:"Gain 5 kg of muscle in 4 months.", entities:["Muscle Gain","5 kg","4 months"], streakTasks:["Daily Protein","Sleep 7–9h","Mobility (10m)"], todayTasks:["Leg Day","Log measurements","Prep protein meals"], daysLeft:"120 days left", progress:8 },
+        { text:"Learn Spanish to a conversational level by June 2026.", entities:["Spanish","Conversational","June 2026"], streakTasks:["Study 25m","Vocab SRS","1 voice note"], todayTasks:["7‑day plan","Placement test","30m speaking"], daysLeft:"290 days left", progress:12 }
+      ];
+      const el = sel => document.querySelector(sel);
+      const typed=el('.gd-typed-text'), entities=el('.gd-entities'), genBtn=el('.gd-generate-btn'), shimmer=el('.gd-shimmer-bar'),
+            sCount=el('.gd-streak-count'), sList=el('.gd-streak-list'), tCount=el('.gd-today-count'), tList=el('.gd-today-list'),
+            days=el('.gd-days-left'), bar=el('.gd-progress-bar'), pText=el('.gd-progress-text'), toast=el('.gd-toast');
+      const required=[typed,entities,genBtn,shimmer,sCount,sList,tCount,tList,days,bar,pText,toast];
+      if(required.some(n=>!n)) return; // Short-circuit if the demo markup isn't on the page
+      let i=0, busy=false;
+      function typeText(text,speed=50){ return new Promise(res=>{ const rm=window.matchMedia('(prefers-reduced-motion: reduce)').matches; const announce=document.getElementById('gd-announce'); if(rm){ typed.textContent=text; if(announce) announce.textContent=text; return res(); } let k=0; typed.textContent=''; (function tick(){ if(k<text.length){ const ch=text[k++]; typed.textContent+=ch; setTimeout(tick, /[.,;!?]/.test(ch)?250: ch===' '?120: speed); } else { if(announce) announce.textContent=text; res(); } })(); }); }
+      const showEntities=e=>{ entities.innerHTML=''; e.forEach(x=>{ const s=document.createElement('span'); s.className='gd-entity'; s.textContent=x; entities.appendChild(s); }); entities.classList.add('visible'); return new Promise(r=>setTimeout(r,180)); };
+      const plan = ()=> new Promise(r=>{ shimmer && shimmer.classList.add('animating'); setTimeout(()=>{ shimmer && shimmer.classList.remove('animating'); r(); },900); });
+      const addList=(list,count,items,withXP)=> new Promise(r=>{ list.innerHTML=''; count.textContent='0'; items.forEach((task,idx)=>{ setTimeout(()=>{ const div=document.createElement('div'); div.className='gd-task-item'; div.innerHTML=`<div class="flex items-center"><div class="gd-task-check"></div><span>${task}</span></div>${withXP?'<span class="gd-xp-pill">+XP</span>':''}`; list.appendChild(div); setTimeout(()=>div.classList.add('visible'),10); count.textContent=String(idx+1); if(idx===items.length-1) setTimeout(r,90); }, idx*90); }); });
+      const footer=(d,p)=> new Promise(r=>{ days.textContent=d; pText.textContent=`${p}% complete`; setTimeout(()=>{ bar.style.width=p+'%'; setTimeout(()=>{ toast.style.opacity='1'; setTimeout(()=>{ toast.style.opacity='0'; r(); },1200); },200); },500); });
+      function reset(){ typed.textContent=''; entities.classList.remove('visible'); genBtn.classList.remove('visible'); sList.innerHTML=tList.innerHTML=''; sCount.textContent=tCount.textContent='0'; bar.style.width='0%'; toast.style.opacity='0'; }
+      async function cycle(){ if(busy) return; busy=true; const g=goals[i]; await typeText(g.text); await showEntities(g.entities); genBtn.classList.add('visible'); await plan(); await addList(sList,sCount,g.streakTasks,false); await addList(tList,tCount,g.todayTasks,true); await footer(g.daysLeft,g.progress); setTimeout(()=>{ reset(); busy=false; i=(i+1)%goals.length; setTimeout(cycle,1600); },800); }
+      setTimeout(cycle,800);
+    })();
+  </script>
+  
+  <!-- New Goal Demo Script -->
+  <script>
+    (function() {
+      const GOALS = [
+        {
+          text: "Run a marathon under 4 hours by October 2025.",
+          entities: ["Marathon", "Under 4 hours", "October 2025"],
+          streakTasks: ["Morning Run (30m)", "Stretch Routine", "Hydration Log"],
+          todayTasks: ["Long Run (10 miles)", "Plan Nutrition", "Gear Check"],
+          daysLeft: "240 days left",
+          progress: 15
+        },
+        {
+          text: "Launch a SaaS product with 1000 paying users.",
+          entities: ["SaaS Product", "1000 Users", "Launch"],
+          streakTasks: ["Code 1h Daily", "User Research", "Marketing Post"],
+          todayTasks: ["Build MVP Feature", "Onboard 5 Beta Users", "Create Pricing Page"],
+          daysLeft: "180 days left",
+          progress: 22
+        },
+        {
+          text: "Read 50 books on personal finance this year.",
+          entities: ["50 Books", "Personal Finance", "This Year"],
+          streakTasks: ["Daily Reading (20m)", "Take Notes", "Review Summary"],
+          todayTasks: ["Finish Book #12", "Write Reflection", "Plan Next 3 Books"],
+          daysLeft: "95 days left",
+          progress: 48
+        },
+        {
+          text: "Learn to play piano and perform a recital.",
+          entities: ["Piano", "Recital", "Performance"],
+          streakTasks: ["Practice Scales (15m)", "Sight-Reading", "Metronome Work"],
+          todayTasks: ["Learn New Piece", "Record Progress", "Book Venue"],
+          daysLeft: "310 days left",
+          progress: 8
+        }
+      ];
+
+      // DOM Elements
+      const typedText = document.querySelector('.gd-typed-text');
+      const entitiesContainer = document.querySelector('.gd-entities');
+      const generateChip = document.querySelector('.gd-generate-chip');
+      const thinkingSection = document.querySelector('.gd-thinking');
+      const streakCount = document.querySelector('.gd-streak-count');
+      const streakList = document.querySelector('.gd-streak-list');
+      const todayCount = document.querySelector('.gd-today-count');
+      const todayList = document.querySelector('.gd-today-list');
+      const daysLeft = document.querySelector('.gd-days-left');
+      const progressBar = document.querySelector('.gd-progress-fill');
+      const progressText = document.querySelector('.gd-progress-text');
+      const announceRegion = document.getElementById('gd-announce');
+
+      let currentIndex = 0;
+      let isBusy = false;
+
+      // Utility Functions
+      function typeText(text, speed = 50) {
+        return new Promise(res => {
+          const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+          if (prefersReducedMotion) {
+            typedText.textContent = text;
+            announceRegion.textContent = text;
+            return res();
+          }
+
+          let i = 0;
+          typedText.textContent = '';
+          
+          (function type() {
+            if (i < text.length) {
+              const char = text.charAt(i);
+              typedText.textContent += char;
+              i++;
+              
+              let delay = speed;
+              if (char === ' ') delay = 120;
+              if (/[.,!?;]/.test(char)) delay = 250;
+              
+              setTimeout(type, delay);
+            } else {
+              announceRegion.textContent = text;
+              res();
+            }
+          })();
+        });
+      }
+
+      function showEntities(entities) {
+        entitiesContainer.innerHTML = '';
+        entities.forEach(entity => {
+          const span = document.createElement('span');
+          span.className = 'gd-entity';
+          span.textContent = entity;
+          entitiesContainer.appendChild(span);
+        });
+        entitiesContainer.classList.add('visible');
+        return new Promise(r => setTimeout(r, 180));
+      }
+
+      function showThinking() {
+        thinkingSection.classList.add('visible');
+        return new Promise(r => setTimeout(r, 800));
+      }
+
+      function hideThinking() {
+        thinkingSection.classList.remove('visible');
+      }
+
+      function addTaskList(listElement, countElement, tasks, withXP = false) {
+        return new Promise(resolve => {
+          listElement.innerHTML = '';
+          countElement.textContent = '0';
+          
+          tasks.forEach((task, idx) => {
+            setTimeout(() => {
+              const taskItem = document.createElement('div');
+              taskItem.className = 'gd-task-item';
+              taskItem.innerHTML = `
+                <span>${task}</span>
+                ${withXP ? '<span class="gd-xp-pill">+XP</span>' : ''}
+              `;
+              listElement.appendChild(taskItem);
+              
+              // Trigger animation
+              setTimeout(() => {
+                taskItem.classList.add('visible');
+              }, 10);
+              
+              countElement.textContent = String(idx + 1);
+              
+              if (idx === tasks.length - 1) {
+                setTimeout(resolve, 100);
+              }
+            }, idx * 80);
+          });
+        });
+      }
+
+      function updateFooter(goal) {
+        daysLeft.textContent = goal.daysLeft;
+        progressText.textContent = `${goal.progress}% complete`;
+        progressBar.style.width = `${goal.progress}%`;
+      }
+
+      function resetUI() {
+        // Reset text
+        typedText.textContent = '';
+        entitiesContainer.classList.remove('visible');
+        generateChip.classList.remove('visible');
+        
+        // Reset tasks
+        streakList.innerHTML = '';
+        todayList.innerHTML = '';
+        streakCount.textContent = '0';
+        todayCount.textContent = '0';
+        
+        // Reset progress
+        progressBar.style.width = '0%';
+        progressText.textContent = '0% complete';
+        daysLeft.textContent = 'Loading...';
+        
+        // Hide thinking
+        hideThinking();
+      }
+
+      async function runDemoCycle() {
+        if (isBusy) return;
+        isBusy = true;
+        
+        resetUI();
+        const goal = GOALS[currentIndex];
+        
+        // 1. Type goal
+        await typeText(goal.text);
+        
+        // 2. Show entities
+        await showEntities(goal.entities);
+        
+        // 3. Show generate chip
+        generateChip.classList.add('visible');
+        await new Promise(r => setTimeout(r, 600));
+        
+        // 4. Show thinking
+        await showThinking();
+        
+        // 5. Add tasks
+        await addTaskList(streakList, streakCount, goal.streakTasks, false);
+        await addTaskList(todayList, todayCount, goal.todayTasks, true);
+        
+        // 6. Update footer
+        updateFooter(goal);
+        
+        // 7. Announce to screen reader
+        announceRegion.textContent = `Streak tasks: ${goal.streakTasks.join(', ')}. Today tasks: ${goal.todayTasks.join(', ')}. Deadline: ${goal.daysLeft}. Progress: ${goal.progress}%.`;
+        
+        // 8. Wait before reset
+        await new Promise(r => setTimeout(r, 2000));
+        
+        // 9. Reset and prepare for next
+        resetUI();
+        isBusy = false;
+        currentIndex = (currentIndex + 1) % GOALS.length;
+        setTimeout(runDemoCycle, 1000);
+      }
+
+      // Start the demo
+      setTimeout(runDemoCycle, 1000);
+    })();
+  </script>
+</body>
+</html>
